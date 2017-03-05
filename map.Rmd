@@ -1,0 +1,62 @@
+---
+title: "CSE"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library("dplyr")
+library('rsconnect')
+library("maps")
+library("mapproj")
+library("plyr")
+library("httr")
+library("jsonlite")
+library("knitr")
+library("ggplot2")
+library("tidyr")
+library("mapdata")
+library("plotly")
+knitr::opts_chunk$set(echo = F)
+crime <- read.csv("crime_dataset.csv", stringsAsFactors = F)
+```
+
+```{r, echo = FALSE, warning = FALSE}
+
+
+
+total.crime <- ddply(crime, c("State"), function(x){
+  sum.inc <- sum(x$Incident)
+  data.frame(sum.incident = sum.inc)
+})
+
+
+total.crime$State <- tolower(total.crime$State)
+states <- map_data("state")
+map.df<-merge(states, total.crime, by.x = "region", by.y = "State", all.x=T)
+map.df <- map.df[order(map.df$order),]
+map1 <- ggplot(map.df, aes(x=long,y=lat,group=group))+
+  geom_polygon(aes(fill=sum.incident))+
+  geom_path()+ ggtitle("Crime in the US")+
+  scale_fill_gradientn(colours=rev(heat.colors(10)),na.value="grey90")+
+  coord_map()+theme_minimal()
+map1
+```
+
+```{r, echo = FALSE, warning = FALSE}  
+  ##Now, remake the map with points
+lat.new<-round(map.df$lat, digits = 0)
+long.new<-round(map.df$long, digits = 0)
+
+df.new<-cbind(map.df, lat.new)
+df.new<-cbind(df.new, long.new)
+
+coords.new<-merge(total.crime,df.new, by.x="State", by.y="region")
+coords.new <- subset(coords.new, select = -c(long, lat, group, order, sum.incident.x, subregion) )
+coords.new2<-unique(coords.new)
+
+# attach(coords.new2)
+
+gg<- ggplot(coords.new2, aes(long.new, lat.new))
+gg+geom_point(aes(color= sum.incident.y))+scale_color_gradientn(colours=rev(heat.colors(10)))+theme(legend.position = "none")+aes(size =6)
+``````
+

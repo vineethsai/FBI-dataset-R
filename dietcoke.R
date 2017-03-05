@@ -1,0 +1,7 @@
+library('dplyr')
+library('maps')
+library('ggmap')
+library('ggplot2')
+library('maps')
+airbnb.data <- read.csv('listings.csv', stringsAsFactors = FALSE)
+seattle <- qmap("seattle", zoom = 11, source="stamen", maptype="toner",darken = c(.3,"#BBBBBB"))

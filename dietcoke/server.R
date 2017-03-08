@@ -17,13 +17,21 @@ library("ggvis")
 crime <- read.csv("crime_dataset.csv", stringsAsFactors = F)
 
 server <- function(input, output) {
-    
-  output$plot <- renderPlot({
-      year = input$year
-      crime.plot <- crime %>% select(Perpetrator.Age, Victim.Count, Year) %>% group_by(Perpetrator.Age) %>% summarise(Victim = sum(Victim.Count))
-      ggplot(data = crime.plot, aes(Perpetrator.Age, Victim)) +
+  
+  crime.plot <- crime %>% select(Perpetrator.Age, Incident) %>% filter(Perpetrator.Age != 0) %>% group_by(Perpetrator.Age) %>% summarise(Count = sum(Incident))
+ 
+   output$plot <- renderPlot({
+      ggplot(data = crime.plot, aes(Perpetrator.Age, Count)) +
         geom_point(size = input$size)
     })
+  
+  output$click_info <- renderPrint({
+    nearPoints(crime.plot, input$plot_click, addDist = TRUE)
+  })
+  
+  output$brush_info <- renderPrint({
+    brushedPoints(crime.plot, input$plot_brush) 
+  })
     
   output$map <- renderPlot({
     total.crime <- ddply(crime, c("State"), function(x){

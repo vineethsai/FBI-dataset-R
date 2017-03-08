@@ -11,23 +11,33 @@ ui <- fluidPage(
   
   sidebarLayout(
     sidebarPanel(
-      
-       sliderInput("year",
-                   "Years:",
-                   min = min(crime.plot$Year),
-                   max = max(crime.plot$Year),
-                   value = c(min(crime.plot$Year), max(crime.plot$Year)),
-                   sep = ""),
        sliderInput('size', 
-                   "Point size", 
-                   min = 0.2, 
-                   max = 5, 
+                   "Point size",
+                   min = 0.2,
+                   max = 5,
                    value = 1)
     ),
     
     mainPanel(
       tabsetPanel(type = "tabs", 
-                  tabPanel("Plot", fluidRow(plotOutput('plot'))),
+                  tabPanel("Plot", fluidRow(plotOutput('plot', height = 250,
+                                              click = 'plot_click',
+                                              brush = brushOpts(
+                                                id = "plot_brush")
+                  )
+                  ), 
+                  fluidRow(
+                    column(width = 6, 
+                           h4("Points near click"),
+                           verbatimTextOutput("click_info")
+                    ),
+                    column(width = 6,
+                           h4("Brushed points"),
+                           verbatimTextOutput("brush_info")
+                    )
+                  )
+                  ),
+
                   tabPanel("Histogram"),
                   tabPanel("Map", fluidRow(plotOutput('map'))),
                   tabPanel("Pie Chart"))

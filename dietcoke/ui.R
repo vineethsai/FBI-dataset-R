@@ -1,33 +1,29 @@
-#
-# This is the user-interface definition of a Shiny web application. You can
-# run the application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-# 
-#    http://shiny.rstudio.com/
-#
+library('shiny')
+library('ggplot2')
+library('rsconnect')
+library('dplyr')
 
-library(shiny)
+ui <- fluidPage(
+  #crime <- read.csv("crime_dataset.csv", stringsAsFactors = F),
 
-# Define UI for application that draws a histogram
-shinyUI(fluidPage(
+  titlePanel("American Homocide Rates by Race, Gender, and Age"),
   
-  # Application title
-  titlePanel("Old Faithful Geyser Data"),
-  
-  # Sidebar with a slider input for number of bins 
   sidebarLayout(
     sidebarPanel(
-       sliderInput("bins",
-                   "Number of bins:",
-                   min = 1,
-                   max = 50,
-                   value = 30)
+      sliderInput("n", 'Year Displayed:', min = min(crime$Year), max = max(crime$Year), value = min(crime$Year), sep = "", step = 5)
     ),
     
-    # Show a plot of the generated distribution
     mainPanel(
-       plotOutput("distPlot")
+      tabsetPanel(type = "tabs", 
+                  tabPanel("Pie Chart",
+
+                  plotOutput("plot1"),
+                  verbatimTextOutput("info")
+                  )
+      )
     )
   )
-))
+)
+
+
+shinyUI(ui)

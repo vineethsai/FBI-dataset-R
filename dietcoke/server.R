@@ -55,6 +55,7 @@ server <- function(input, output) {
   })
   
   output$info <- renderText({
+    crime <- selected()
     str2 <- paste0(c("During ", input$n), collapse = "")
     str1 <- paste0(" there were ", nrow(crime[crime$Victim.Race == "Black", ]), " black victims, ")
     str3 <- paste0(nrow(crime[crime$Victim.Race == "White", ]), " white victims, ")
